@@ -10,19 +10,32 @@
             .input {
                 margin-bottom: 1rem;
             }
+
             button.input {
                 text-align: center;
                 justify-content: center;
             }
+
+            ul.columns{
+                flex-wrap: wrap;
+            }
+
+            ul .is-full{
+                display: block;
+                width: 100%;
+            }
+
             p {
                 padding: 1rem: 0;
             }
 
             a {
                 display: inline-block;
+                transition: 0.3s ease all;
             }
-            a:hover {
 
+            a:hover {
+                transform: scale(1:1);
             }
 
         </style>
@@ -54,7 +67,8 @@
                     return {
                         apptitle: 'Vue.JS GIPHY API In-Class Example',
                         searchterm: '',
-                        giphyResults: {}
+                        giphyResults: {},
+                        isList: false
                     }
                 },
                 methods: {
@@ -64,6 +78,22 @@
                               .then( response => {
                                   this.giphyResults = response.data.data;
                              } );
+                    },
+                    toggleListView ()
+                    {
+                        this.isList = !this.isList;
+                    },
+                    giphyImage (images)
+                    {
+                        if ( this.isList === true )
+                        {
+                            return images.original.url;
+                        }
+                        else {
+                        {
+                            return images.fixed_width.url;
+                        }
+                        }
                     }
                 },
                 template: `
@@ -72,12 +102,13 @@
                         <form @submit.prevent="giphySearch">
                             <input v-model="searchterm" type="search" class="input" placeholder="Enter a Search Term.">
                             <input type="submit" value="Submit Search" class="input">
+                            <button @click="toggleListView" class="input has-text-centered">Toggle Grid/List View</button>
                         </form>
                         <p>Current Search Term: {{ searchterm }}</p>
-                        <ul v-for="gif in giphyResults" class="columns">
-                            <li class="column">
+                        <ul class="columns">
+                            <li v-for="gif in giphyResults" class="column" v-bind:class="{ 'is-full' : isList, 'is-one-quarter' : !isList }">
                                 <a v-bind:href="gif.url" target="_blank">
-                                    <img v-bind:src="gif.images.fixed_width.url"
+                                    <img v-bind:src="giphyImage(gif.images)"
                                     v-bind:alt="gif.slug">
                                 </a>
                             </li>
